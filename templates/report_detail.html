@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ project.title }} — Report Details{% endblock %}
+{% block page_title %}Report Analysis Details{% endblock %}
+
+{% block content %}
+<!-- Title Banner Card -->
+<div class="card" style="margin-bottom: 2rem; background: linear-gradient(135deg, #ffffff, #f8fafc); border-left: 6px solid var(--primary);">
+  <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+    <div>
+      <span class="badge badge-indigo" style="margin-bottom: 0.5rem;">Uploaded {{ project.upload_date.strftime('%b %d, %Y') }}</span>
+      <h2 style="font-size: 1.8rem; font-weight: 900; color: var(--text-main);">{{ project.title }}</h2>
+      <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.25rem;">File: {{ project.filename or 'Pasted Text' }}</p>
+    </div>
+    <form action="{{ url_for('reports.start_practice_for_report', project_id=project.id) }}" method="POST">
+      <button type="submit" class="btn-primary-action" style="padding: 0.75rem 1.5rem;">
+        Launch Viva Session
+        <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Extracted Metadata Grid -->
+<h3 class="section-title">Extracted Project Metadata</h3>
+<div class="card-grid" style="grid-template-columns: repeat(2, 1fr);">
+  <div class="card">
+    <div style="font-size: 0.8rem; font-weight: 800; color: var(--primary); text-transform: uppercase; margin-bottom: 0.4rem;">Problem Statement</div>
+    <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-main);">{{ project.problem_statement or 'N/A' }}</p>
+  </div>
+
+  <div class="card">
+    <div style="font-size: 0.8rem; font-weight: 800; color: var(--primary); text-transform: uppercase; margin-bottom: 0.4rem;">Objective</div>
+    <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-main);">{{ project.objective or 'N/A' }}</p>
+  </div>
+
+  <div class="card">
+    <div style="font-size: 0.8rem; font-weight: 800; color: var(--secondary); text-transform: uppercase; margin-bottom: 0.4rem;">Technologies & Frameworks</div>
+    <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-main);">{{ project.technologies or 'N/A' }}</p>
+  </div>
+
+  <div class="card">
+    <div style="font-size: 0.8rem; font-weight: 800; color: var(--secondary); text-transform: uppercase; margin-bottom: 0.4rem;">Programming Languages</div>
+    <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-main);">{{ project.programming_languages or 'N/A' }}</p>
+  </div>
+
+  <div class="card">
+    <div style="font-size: 0.8rem; font-weight: 800; color: var(--accent-cyan); text-transform: uppercase; margin-bottom: 0.4rem;">Dataset</div>
+    <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-main);">{{ project.dataset or 'N/A' }}</p>
+  </div>
+
+  <div class="card">
+    <div style="font-size: 0.8rem; font-weight: 800; color: var(--accent-cyan); text-transform: uppercase; margin-bottom: 0.4rem;">Algorithms & Models</div>
+    <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-main);">{{ project.algorithms or 'N/A' }}</p>
+  </div>
+
+  <div class="card" style="grid-column: span 2;">
+    <div style="font-size: 0.8rem; font-weight: 800; color: var(--accent-emerald); text-transform: uppercase; margin-bottom: 0.4rem;">Methodology</div>
+    <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-main);">{{ project.methodology or 'N/A' }}</p>
+  </div>
+
+  <div class="card" style="grid-column: span 2;">
+    <div style="font-size: 0.8rem; font-weight: 800; color: var(--accent-emerald); text-transform: uppercase; margin-bottom: 0.4rem;">System Architecture</div>
+    <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-main);">{{ project.system_architecture or 'N/A' }}</p>
+  </div>
+
+  <div class="card">
+    <div style="font-size: 0.8rem; font-weight: 800; color: var(--accent-amber); text-transform: uppercase; margin-bottom: 0.4rem;">Results</div>
+    <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-main);">{{ project.results or 'N/A' }}</p>
+  </div>
+
+  <div class="card">
+    <div style="font-size: 0.8rem; font-weight: 800; color: var(--accent-amber); text-transform: uppercase; margin-bottom: 0.4rem;">Conclusion</div>
+    <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-main);">{{ project.conclusion or 'N/A' }}</p>
+  </div>
+</div>
+
+<!-- Questions Bank -->
+<h3 class="section-title">Generated Viva Questions (10 Categories)</h3>
+<div class="table-wrapper" style="margin-bottom: 2.5rem;">
+  <table class="custom-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Category</th>
+        <th>Difficulty</th>
+        <th>Question Text</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for q in questions %}
+      <tr>
+        <td style="font-weight: 700;">{{ q.question_number }}</td>
+        <td><span class="badge badge-indigo">{{ q.category }}</span></td>
+        <td><span class="badge badge-purple">{{ q.difficulty }}</span></td>
+        <td style="font-weight: 600; color: var(--text-main);">{{ q.question_text }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

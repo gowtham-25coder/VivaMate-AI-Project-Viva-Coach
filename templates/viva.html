@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block title %}Viva Exam — {{ project.title }}{% endblock %}
+{% block page_title %}Viva Practice Studio{% endblock %}
+
+{% block content %}
+<div class="viva-container">
+  <!-- Session Header -->
+  <div class="viva-header-card">
+    <div>
+      <div style="font-size: 0.8rem; font-weight: 700; color: #818cf8; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.3rem;">
+        Live Viva Rehearsal
+      </div>
+      <h2 style="font-size: 1.6rem; font-weight: 800; color: white;">{{ project.title }}</h2>
+      <div style="font-size: 0.85rem; color: #cbd5e1; margin-top: 0.4rem;">
+        Technologies: <strong>{{ project.technologies or 'N/A' }}</strong> | Algorithms: <strong>{{ project.algorithms or 'N/A' }}</strong>
+      </div>
+    </div>
+    <div style="text-align: right;">
+      <div style="font-size: 0.78rem; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Average Score</div>
+      <div style="font-size: 2rem; font-weight: 900; color: #38bdf8;" id="session-avg-score">{{ session.average_score }}</div>
+    </div>
+  </div>
+
+  <!-- Progress Bar -->
+  <div style="margin-bottom: 1.5rem;">
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="viva-progress-fill" style="width: 10%;"></div>
+    </div>
+  </div>
+
+  <!-- One Question At A Time Card -->
+  <div class="viva-question-card" id="viva-question-card" data-session-id="{{ session.id }}" data-total-questions="{{ total_questions }}">
+    <!-- Meta bar -->
+    <div class="question-meta-bar">
+      <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <span class="badge badge-indigo" id="q-number-badge">Question 1 of 10</span>
+        <span class="badge badge-purple" id="q-category-badge">Category</span>
+      </div>
+      <span class="badge badge-amber" id="q-difficulty-badge">Medium</span>
+    </div>
+
+    <!-- Question Title -->
+    <h3 class="question-text-title" id="q-text-heading">
+      Loading question...
+    </h3>
+
+    <!-- Student Answer Input Area -->
+    <div class="form-group">
+      <label class="form-label" for="student-answer-input">Your Viva Response:</label>
+      <textarea id="student-answer-input" class="form-textarea answer-textarea" placeholder="Type your answer here... Explain your thought process, technical details, and choices cleanly as you would respond to an external examiner."></textarea>
+    </div>
+
+    <!-- Interactive Buttons -->
+    <div class="action-buttons-row">
+      <button type="button" class="btn-secondary-action" id="btn-skip-question">
+        <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path></svg>
+        Skip Question
+      </button>
+
+      <div style="display: flex; gap: 0.75rem;">
+        <button type="button" class="btn-primary-action" id="btn-submit-answer" style="padding: 0.75rem 1.8rem;">
+          <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+          Submit Answer
+        </button>
+
+        <button type="button" class="btn-primary-action" id="btn-next-question" style="display: none; padding: 0.75rem 1.8rem; background: linear-gradient(135deg, #10b981, #059669);">
+          Next Question
+          <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Feedback Card Drawer -->
+  <div class="feedback-card" id="feedback-card" style="display: none;">
+    <div class="score-circle-wrapper">
+      <div class="score-badge-large" id="fb-score">8.5/10</div>
+      <div>
+        <h4 style="font-size: 1.25rem; font-weight: 800; color: var(--text-main);">AI Viva Evaluation Result</h4>
+        <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 0.2rem;">Detailed examiner feedback and suggestions to perfect your answer.</p>
+      </div>
+    </div>
+
+    <!-- What was correct -->
+    <div class="feedback-section">
+      <div class="feedback-section-title correct">
+        <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        What was correct
+      </div>
+      <div class="feedback-box" id="fb-correct"></div>
+    </div>
+
+    <!-- What was missing -->
+    <div class="feedback-section">
+      <div class="feedback-section-title missing">
+        <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+        What was missing
+      </div>
+      <div class="feedback-box" id="fb-missing"></div>
+    </div>
+
+    <!-- How to improve -->
+    <div class="feedback-section">
+      <div class="feedback-section-title improve">
+        <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+        How to improve
+      </div>
+      <div class="feedback-box" id="fb-improve"></div>
+    </div>
+
+    <!-- Suggested Answer -->
+    <div class="feedback-section">
+      <div class="feedback-section-title suggested">
+        <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        Exemplary Model Answer
+      </div>
+      <div class="feedback-box" id="fb-suggested" style="background-color: #f5f3ff; border-color: #ddd6fe;"></div>
+    </div>
+
+    <!-- Follow up question -->
+    <div class="feedback-section" id="fb-followup-box">
+      <div class="feedback-section-title followup">
+        <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        Possible Follow-Up Examiner Question
+      </div>
+      <div class="feedback-box" id="fb-followup" style="background-color: #ecfeff; border-color: #a5f3fc; font-weight: 600;"></div>
+    </div>
+  </div>
+</div>
+{% endblock %}

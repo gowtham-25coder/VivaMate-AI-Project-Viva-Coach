@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block title %}Home — VivaMate AI Project Viva Coach{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- Hero / Header Card -->
+<div style="background: linear-gradient(135deg, #0f172a, #1e1b4b); color: white; border-radius: var(--radius-xl); padding: 3rem 2.5rem; margin-bottom: 2.5rem; position: relative; overflow: hidden; box-shadow: var(--shadow-lg);">
+  <div style="max-width: 650px; position: relative; z-index: 2;">
+    <div style="display: inline-block; background: rgba(99, 102, 241, 0.2); border: 1px solid rgba(129, 140, 248, 0.4); border-radius: 9999px; padding: 0.35rem 1rem; font-size: 0.8rem; font-weight: 700; color: #a5b4fc; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 1rem;">
+      AI Project Viva Coach
+    </div>
+    <h1 style="font-size: 2.5rem; font-weight: 900; letter-spacing: -0.03em; line-height: 1.15; margin-bottom: 1rem;">
+      Prepare for your project viva with questions generated directly from your own project report.
+    </h1>
+    <p style="font-size: 1.05rem; color: #cbd5e1; line-height: 1.6; margin-bottom: 2rem;">
+      VivaMate analyzes your report structure, technical stack, algorithms, and results to simulate a realistic viva examination with instant AI feedback.
+    </p>
+    <a href="{{ url_for('practice.practice') }}" class="btn-primary-action" style="padding: 0.85rem 1.8rem; font-size: 1rem;">
+      Start Viva Practice Now
+      <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+    </a>
+  </div>
+</div>
+
+<!-- Onboarding Steps -->
+<h2 class="section-title">
+  <svg style="width: 24px; height: 24px; color: var(--primary);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+  How VivaMate Works
+</h2>
+<div class="steps-container">
+  <div class="step-card">
+    <div class="step-number">01</div>
+    <h3 class="step-title">Bring your project</h3>
+    <p class="step-desc">Upload your project report in PDF or TXT format, or paste your project document content directly into the Practice Studio.</p>
+  </div>
+  <div class="step-card">
+    <div class="step-number">02</div>
+    <h3 class="step-title">Rehearse your viva</h3>
+    <p class="step-desc">Answer 10 tailor-made, AI-generated viva questions across technical, algorithmic, architecture, and testing categories one question at a time.</p>
+  </div>
+  <div class="step-card">
+    <div class="step-number">03</div>
+    <h3 class="step-title">Refine your answers</h3>
+    <p class="step-desc">Receive immediate feedback on accuracy, missing points, suggested exemplary answers, and targeted follow-up examiner questions.</p>
+  </div>
+</div>
+
+<!-- Performance Overview Stats -->
+<h2 class="section-title">
+  <svg style="width: 24px; height: 24px; color: var(--secondary);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+  Overview Statistics
+</h2>
+<div class="card-grid">
+  <div class="card stat-card">
+    <div class="stat-icon-wrapper stat-icon-indigo">
+      <svg style="width: 28px; height: 28px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+    </div>
+    <div>
+      <div class="stat-value">{{ total_projects }}</div>
+      <div class="stat-label">Projects Uploaded</div>
+    </div>
+  </div>
+
+  <div class="card stat-card">
+    <div class="stat-icon-wrapper stat-icon-purple">
+      <svg style="width: 28px; height: 28px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 100-6 3 3 0 000 6z"></path></svg>
+    </div>
+    <div>
+      <div class="stat-value">{{ total_sessions }}</div>
+      <div class="stat-label">Practice Sessions</div>
+    </div>
+  </div>
+
+  <div class="card stat-card">
+    <div class="stat-icon-wrapper stat-icon-emerald">
+      <svg style="width: 28px; height: 28px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+    </div>
+    <div>
+      <div class="stat-value">{{ total_questions_attempted }}</div>
+      <div class="stat-label">Questions Answered</div>
+    </div>
+  </div>
+
+  <div class="card stat-card">
+    <div class="stat-icon-wrapper stat-icon-amber">
+      <svg style="width: 28px; height: 28px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
+    </div>
+    <div>
+      <div class="stat-value">{{ avg_score }}/10</div>
+      <div class="stat-label">Average Score</div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Projects -->
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+  <h2 class="section-title" style="margin-bottom: 0;">Recent Projects</h2>
+  <a href="{{ url_for('reports.list_reports') }}" style="color: var(--primary); font-weight: 700; text-decoration: none; font-size: 0.9rem;">View All Reports &rarr;</a>
+</div>
+
+{% if recent_projects %}
+<div class="table-wrapper">
+  <table class="custom-table">
+    <thead>
+      <tr>
+        <th>Project Title</th>
+        <th>Technologies</th>
+        <th>Upload Date</th>
+        <th>Practice Sessions</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for proj in recent_projects %}
+      <tr>
+        <td style="font-weight: 700;">{{ proj.title }}</td>
+        <td><span class="badge badge-indigo">{{ proj.technologies or 'N/A' }}</span></td>
+        <td style="color: var(--text-muted);">{{ proj.upload_date.strftime('%b %d, %Y') }}</td>
+        <td><span class="badge badge-purple">{{ proj.practice_count or 0 }} sessions</span></td>
+        <td>
+          <form action="{{ url_for('reports.start_practice_for_report', project_id=proj.id) }}" method="POST" style="display: inline;">
+            <button type="submit" class="btn-primary-action" style="padding: 0.4rem 0.85rem; font-size: 0.82rem;">Rehearse Viva</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card empty-state">
+  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+  <h3>No projects uploaded yet</h3>
+  <p style="margin-top: 0.5rem; margin-bottom: 1.5rem;">Upload your project report PDF or paste text to generate your personalized viva examination.</p>
+  <a href="{{ url_for('practice.practice') }}" class="btn-primary-action">Go to Practice Studio</a>
+</div>
+{% endif %}
+{% endblock %}

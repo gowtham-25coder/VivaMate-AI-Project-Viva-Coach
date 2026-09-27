@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}VivaMate — AI Project Viva Coach{% endblock %}</title>
+  <meta name="description" content="VivaMate is an AI-powered project viva preparation platform for college students. Prepare for your project viva with personalized AI questions.">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand-header">
+        <div class="brand-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 01-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"></path>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-title">VivaMate</div>
+          <div class="brand-subtitle">AI Project Viva Coach</div>
+        </div>
+      </div>
+
+      <ul class="nav-menu">
+        <li class="nav-item {% if request.endpoint == 'main.index' %}active{% endif %}">
+          <a href="{{ url_for('main.index') }}" id="nav-home">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+            Dashboard
+          </a>
+        </li>
+        <li class="nav-item {% if request.endpoint in ['practice.practice', 'practice.viva_session', 'practice.session_summary'] %}active{% endif %}">
+          <a href="{{ url_for('practice.practice') }}" id="nav-practice">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 100-6 3 3 0 000 6z"></path></svg>
+            Practice Studio
+          </a>
+        </li>
+        <li class="nav-item {% if request.endpoint in ['reports.list_reports', 'reports.view_report'] %}active{% endif %}">
+          <a href="{{ url_for('reports.list_reports') }}" id="nav-reports">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            My Reports
+          </a>
+        </li>
+        <li class="nav-item {% if request.endpoint == 'progress.progress' %}active{% endif %}">
+          <a href="{{ url_for('progress.progress') }}" id="nav-progress">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+            My Progress
+          </a>
+        </li>
+        <li class="nav-item {% if request.endpoint in ['code_review.code_review_index', 'code_review.view_review'] %}active{% endif %}">
+          <a href="{{ url_for('code_review.code_review_index') }}" id="nav-code-review">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+            Code Review
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <div class="api-status-badge">
+          <span class="status-dot {% if gemini_ready %}active{% else %}warning{% endif %}"></span>
+          <span>Gemini AI: {% if gemini_ready %}Active{% else %}Not Configured{% endif %}</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="main-wrapper">
+      <header class="top-header">
+        <h1 class="page-header-title">{% block page_title %}Dashboard{% endblock %}</h1>
+        <div class="header-right">
+          <a href="{{ url_for('practice.practice') }}" class="btn-primary-action">
+            <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            New Viva Practice
+          </a>
+        </div>
+      </header>
+
+      <main class="content-body">
+        <!-- AI Not Configured Alert Banner -->
+        {% if not gemini_ready %}
+        <div class="alert-banner alert-banner-warning" id="gemini-warning-banner">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+          <div>
+            <strong>AI service is not configured. Add GEMINI_API_KEY to your .env file.</strong>
+            <p style="margin-top: 0.25rem; font-size: 0.85rem;">Set your Google Gemini API key in <code>.env</code> file to enable AI viva question generation and instant answer evaluations.</p>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert-banner alert-banner-{{ category }}">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <div>{{ message }}</div>
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

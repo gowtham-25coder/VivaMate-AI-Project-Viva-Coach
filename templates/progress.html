@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}My Progress — VivaMate AI Project Viva Coach{% endblock %}
+{% block page_title %}My Progress & Analytics{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+  <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--text-main);">Performance & Analytics</h2>
+  <p style="color: var(--text-muted); font-size: 0.92rem; margin-top: 0.25rem;">
+    Track your viva rehearsal progress, identify technical strengths, and focus on weak topic areas.
+  </p>
+</div>
+
+<!-- Stats Grid -->
+<div class="card-grid">
+  <div class="card stat-card">
+    <div class="stat-icon-wrapper stat-icon-indigo">
+      <svg style="width: 28px; height: 28px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+    </div>
+    <div>
+      <div class="stat-value">{{ total_questions_attempted }}</div>
+      <div class="stat-label">Total Questions Attempted</div>
+    </div>
+  </div>
+
+  <div class="card stat-card">
+    <div class="stat-icon-wrapper stat-icon-amber">
+      <svg style="width: 28px; height: 28px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
+    </div>
+    <div>
+      <div class="stat-value">{{ avg_score }}/10</div>
+      <div class="stat-label">Average Answer Score</div>
+    </div>
+  </div>
+
+  <div class="card stat-card">
+    <div class="stat-icon-wrapper stat-icon-purple">
+      <svg style="width: 28px; height: 28px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 100-6 3 3 0 000 6z"></path></svg>
+    </div>
+    <div>
+      <div class="stat-value">{{ projects_practiced }}</div>
+      <div class="stat-label">Projects Practiced</div>
+    </div>
+  </div>
+</div>
+
+<!-- Topic Mastery Analysis (Strong vs Weak Topics) -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2.5rem;">
+  <!-- Strong Topics -->
+  <div class="card" style="border-top: 4px solid var(--accent-emerald);">
+    <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--accent-emerald); display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.25rem;">
+      <svg style="width: 22px; height: 22px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      Strong Topics (&ge; 7.0 Score)
+    </h3>
+    {% if strong_topics %}
+      {% for topic in strong_topics %}
+      <div style="margin-bottom: 1rem;">
+        <div style="display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: 700; margin-bottom: 0.3rem;">
+          <span>{{ topic.category }}</span>
+          <span style="color: var(--accent-emerald);">{{ topic.score }}/10</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" style="width: {{ topic.score * 10 }}%; background-color: var(--accent-emerald);"></div>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <p style="color: var(--text-muted); font-size: 0.9rem;">No strong topics recorded yet. Keep practicing to build expertise!</p>
+    {% endif %}
+  </div>
+
+  <!-- Weak Topics -->
+  <div class="card" style="border-top: 4px solid var(--accent-amber);">
+    <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--accent-amber); display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.25rem;">
+      <svg style="width: 22px; height: 22px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+      Weak Topics (&lt; 7.0 Score)
+    </h3>
+    {% if weak_topics %}
+      {% for topic in weak_topics %}
+      <div style="margin-bottom: 1rem;">
+        <div style="display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: 700; margin-bottom: 0.3rem;">
+          <span>{{ topic.category }}</span>
+          <span style="color: var(--accent-amber);">{{ topic.score }}/10</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" style="width: {{ topic.score * 10 }}%; background-color: var(--accent-amber);"></div>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <p style="color: var(--text-muted); font-size: 0.9rem;">No weak topics detected. Excellent performance!</p>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Recent Practice Sessions History -->
+<h3 class="section-title">Recent Practice Sessions</h3>
+{% if recent_sessions %}
+<div class="table-wrapper">
+  <table class="custom-table">
+    <thead>
+      <tr>
+        <th>Project Title</th>
+        <th>Start Time</th>
+        <th>Questions Answered</th>
+        <th>Average Score</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for sess in recent_sessions %}
+      <tr>
+        <td style="font-weight: 700;">{{ sess.project.title if sess.project else 'N/A' }}</td>
+        <td style="color: var(--text-muted);">{{ sess.start_time.strftime('%b %d, %Y %H:%M') }}</td>
+        <td>{{ sess.answered_count }} / {{ sess.total_questions }}</td>
+        <td style="font-weight: 800; color: var(--primary);">{{ sess.average_score }}/10</td>
+        <td>
+          <span class="badge {% if sess.status == 'completed' %}badge-emerald{% else %}badge-indigo{% endif %}">
+            {{ sess.status }}
+          </span>
+        </td>
+        <td>
+          <a href="{{ url_for('practice.session_summary', session_id=sess.id) }}" class="btn-secondary-action" style="padding: 0.35rem 0.85rem; font-size: 0.82rem; text-decoration: none;">View Summary</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card empty-state">
+  <p>No practice sessions recorded yet.</p>
+</div>
+{% endif %}
+{% endblock %}

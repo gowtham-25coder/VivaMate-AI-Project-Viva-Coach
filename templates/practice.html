@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}Practice Studio — VivaMate AI Project Viva Coach{% endblock %}
+{% block page_title %}Practice Studio{% endblock %}
+
+{% block content %}
+<div class="upload-card-wrapper">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+    <div>
+      <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--text-main);">Upload Project Report</h2>
+      <p style="color: var(--text-muted); font-size: 0.92rem; margin-top: 0.25rem;">
+        Upload your PDF/TXT project report or paste your project documentation text (Max 10 MB).
+      </p>
+    </div>
+  </div>
+
+  <div class="tabs-nav">
+    <button class="tab-btn active" data-tab="tab-upload">Upload File (PDF / TXT)</button>
+    <button class="tab-btn" data-tab="tab-paste">Paste Report Text</button>
+  </div>
+
+  <!-- Tab 1: File Upload Form -->
+  <div id="tab-upload" class="tab-content" style="display: block;">
+    <form action="{{ url_for('practice.upload_report') }}" method="POST" enctype="multipart/form-data">
+      <div class="upload-dropzone">
+        <input type="file" name="report_file" accept=".pdf,.txt" style="display: none;" id="file-input-field">
+        <div class="upload-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+        </div>
+        <div class="upload-title">Click to upload or drag & drop</div>
+        <div class="upload-subtitle">PDF or TXT documents up to 10 MB</div>
+      </div>
+
+      <div style="text-align: right; margin-top: 1.5rem;">
+        <button type="submit" class="btn-primary-action" style="padding: 0.85rem 2rem;">
+          Analyze Report & Generate Viva
+          <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Tab 2: Paste Text Form -->
+  <div id="tab-paste" class="tab-content" style="display: none;">
+    <form action="{{ url_for('practice.upload_report') }}" method="POST">
+      <div class="form-group">
+        <label class="form-label" for="pasted_text">Paste Project Documentation / Abstract / Chapter Text:</label>
+        <textarea name="pasted_text" id="pasted_text" class="form-textarea" style="min-height: 220px;" placeholder="Paste your project abstract, problem statement, technology stack, architecture description, algorithms, results, and conclusion here..."></textarea>
+      </div>
+
+      <div style="text-align: right; margin-top: 1.5rem;">
+        <button type="submit" class="btn-primary-action" style="padding: 0.85rem 2rem;">
+          Analyze Text & Generate Viva
+          <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Select from Existing Projects -->
+<h2 class="section-title">
+  <svg style="width: 24px; height: 24px; color: var(--primary);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 100-6 3 3 0 000 6z"></path></svg>
+  Or Rehearse an Existing Project Report
+</h2>
+
+{% if projects %}
+<div class="table-wrapper">
+  <table class="custom-table">
+    <thead>
+      <tr>
+        <th>Project Title</th>
+        <th>Technologies</th>
+        <th>Last Practiced</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for proj in projects %}
+      <tr>
+        <td style="font-weight: 700;">{{ proj.title }}</td>
+        <td><span class="badge badge-indigo">{{ proj.technologies or 'N/A' }}</span></td>
+        <td style="color: var(--text-muted);">{{ proj.last_practiced.strftime('%b %d, %Y %H:%M') if proj.last_practiced else 'Never' }}</td>
+        <td>
+          <form action="{{ url_for('reports.start_practice_for_report', project_id=proj.id) }}" method="POST" style="display: inline;">
+            <button type="submit" class="btn-primary-action" style="padding: 0.45rem 1rem; font-size: 0.85rem;">Start Session</button>
+          </form>
+          <a href="{{ url_for('reports.view_report', project_id=proj.id) }}" class="btn-secondary-action" style="padding: 0.45rem 1rem; font-size: 0.85rem; text-decoration: none;">View Analysis</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card empty-state">
+  <p>No saved reports available yet. Upload your first report above to get started!</p>
+</div>
+{% endif %}
+{% endblock %}

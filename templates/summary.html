@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}Viva Summary — {{ project.title }}{% endblock %}
+{% block page_title %}Viva Session Summary{% endblock %}
+
+{% block content %}
+<div class="viva-container">
+  <!-- Summary Header -->
+  <div class="viva-header-card" style="background: linear-gradient(135deg, #4f46e5, #8b5cf6);">
+    <div>
+      <div style="font-size: 0.8rem; font-weight: 700; color: #c7d2fe; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.3rem;">
+        Rehearsal Complete
+      </div>
+      <h2 style="font-size: 1.8rem; font-weight: 800; color: white;">{{ project.title }}</h2>
+      <p style="font-size: 0.9rem; color: #e0e7ff; margin-top: 0.3rem;">Completed on {{ session.end_time.strftime('%b %d, %Y %H:%M') if session.end_time else 'Today' }}</p>
+    </div>
+    <div style="text-align: right;">
+      <div style="font-size: 0.8rem; font-weight: 700; color: #e0e7ff; text-transform: uppercase;">Overall Score</div>
+      <div style="font-size: 2.5rem; font-weight: 900; color: white;">{{ session.average_score }}/10</div>
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+    <form action="{{ url_for('reports.start_practice_for_report', project_id=project.id) }}" method="POST" style="flex: 1;">
+      <button type="submit" class="btn-primary-action" style="width: 100%; justify-content: center; padding: 0.85rem;">
+        <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+        Re-take Viva Practice
+      </button>
+    </form>
+    <a href="{{ url_for('reports.view_report', project_id=project.id) }}" class="btn-secondary-action" style="flex: 1; justify-content: center; padding: 0.85rem; text-decoration: none;">
+      View Project Analysis
+    </a>
+  </div>
+
+  <!-- Detailed Answers Breakdown -->
+  <h3 class="section-title">Question Breakdown & Evaluation</h3>
+
+  {% for ans in answers %}
+  <div class="card" style="margin-bottom: 1.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-color);">
+      <div>
+        <span class="badge badge-indigo">Q{{ loop.index }}</span>
+        <span class="badge badge-purple">{{ ans.question.category }}</span>
+        <span class="badge badge-amber">{{ ans.question.difficulty }}</span>
+      </div>
+      <div style="font-size: 1.25rem; font-weight: 800; color: var(--primary);">
+        {% if ans.is_skipped %}<span style="color: var(--text-muted); font-size: 0.9rem;">Skipped</span>{% else %}{{ ans.score }}/10{% endif %}
+      </div>
+    </div>
+
+    <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin-bottom: 1rem;">
+      {{ ans.question.question_text }}
+    </h4>
+
+    <div style="background-color: #f8fafc; padding: 1rem; border-radius: var(--radius-md); border-left: 4px solid var(--primary); margin-bottom: 1rem;">
+      <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Your Answer:</div>
+      <p style="font-size: 0.95rem; color: var(--text-main); margin-top: 0.3rem;">{{ ans.student_answer or 'No answer provided' }}</p>
+    </div>
+
+    {% if not ans.is_skipped %}
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+      <div style="background: #f0fdf4; padding: 0.85rem; border-radius: var(--radius-sm); border: 1px solid #bbf7d0;">
+        <strong style="color: #166534; font-size: 0.85rem;">Correct Points:</strong>
+        <p style="font-size: 0.88rem; color: #14532d; margin-top: 0.2rem;">{{ ans.what_was_correct }}</p>
+      </div>
+      <div style="background: #fffbeb; padding: 0.85rem; border-radius: var(--radius-sm); border: 1px solid #fde68a;">
+        <strong style="color: #92400e; font-size: 0.85rem;">Missing Points:</strong>
+        <p style="font-size: 0.88rem; color: #78350f; margin-top: 0.2rem;">{{ ans.what_was_missing }}</p>
+      </div>
+    </div>
+
+    <div style="background-color: #f5f3ff; padding: 1rem; border-radius: var(--radius-md); border: 1px solid #ddd6fe;">
+      <strong style="color: #6b21a8; font-size: 0.85rem;">Suggested Model Answer:</strong>
+      <p style="font-size: 0.9rem; color: #581c87; margin-top: 0.3rem;">{{ ans.suggested_answer }}</p>
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

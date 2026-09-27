@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %}Code Review — VivaMate AI Project Viva Coach{% endblock %}
+{% block page_title %}Python Code Review{% endblock %}
+
+{% block content %}
+<div class="upload-card-wrapper">
+  <div style="margin-bottom: 1.5rem;">
+    <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--text-main);">Upload & Analyze Python Source Code</h2>
+    <p style="color: var(--text-muted); font-size: 0.92rem; margin-top: 0.25rem;">
+      Upload your <code>.py</code> file or paste your Python code to compare implementation against report claims and detect potential examiner questions.
+    </p>
+  </div>
+
+  <form action="{{ url_for('code_review.analyze_code') }}" method="POST" enctype="multipart/form-data">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+      <!-- Optional Report Context Selector -->
+      <div class="form-group" style="grid-column: span 2;">
+        <label class="form-label" for="project_id">Compare against Project Report (Optional):</label>
+        <select name="project_id" id="project_id" class="form-select">
+          <option value="">-- Standalone Code Analysis (No Report Comparison) --</option>
+          {% for proj in projects %}
+          <option value="{{ proj.id }}">{{ proj.title }} (Uploaded {{ proj.upload_date.strftime('%b %d, %Y') }})</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <div class="tabs-nav">
+      <button type="button" class="tab-btn active" data-tab="tab-code-upload">Upload .py File</button>
+      <button type="button" class="tab-btn" data-tab="tab-code-paste">Paste Python Code</button>
+    </div>
+
+    <!-- Tab 1: Upload File -->
+    <div id="tab-code-upload" class="tab-content" style="display: block;">
+      <div class="upload-dropzone">
+        <input type="file" name="code_file" accept=".py" style="display: none;" id="code-file-field">
+        <div class="upload-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+        </div>
+        <div class="upload-title">Click to upload or drag & drop Python file</div>
+        <div class="upload-subtitle">Python (.py) scripts</div>
+      </div>
+    </div>
+
+    <!-- Tab 2: Paste Code -->
+    <div id="tab-code-paste" class="tab-content" style="display: none;">
+      <div class="form-group">
+        <label class="form-label" for="pasted_code">Paste Python Source Code:</label>
+        <textarea name="pasted_code" id="pasted_code" class="form-textarea code-preview" style="min-height: 250px; font-family: var(--font-mono);" placeholder="import numpy as np&#10;import pandas as pd&#10;# Paste your python script here..."></textarea>
+      </div>
+    </div>
+
+    <div style="text-align: right; margin-top: 1.5rem;">
+      <button type="submit" class="btn-primary-action" style="padding: 0.85rem 2rem;">
+        Analyze Code & Compare Report
+        <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- Analysis Result Section -->
+{% if analysis_result %}
+<div class="viva-container" style="max-width: 100%;">
+  <h2 class="section-title">Code Review Results: {{ analysis_result.filename }}</h2>
+
+  <div class="card-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 2rem;">
+    <!-- Matched Claims -->
+    <div class="card" style="border-top: 4px solid var(--accent-emerald);">
+      <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--accent-emerald); display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+        <svg style="width: 22px; height: 22px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        Matched Claims
+      </h3>
+      {% if analysis_result.matched_claims %}
+        <ul style="list-style-type: none; padding: 0;">
+          {% for claim in analysis_result.matched_claims %}
+          <li style="padding: 0.6rem 0; border-bottom: 1px solid var(--border-color); font-size: 0.92rem; color: var(--text-main); display: flex; gap: 0.5rem; align-items: flex-start;">
+            <span style="color: var(--accent-emerald); font-weight: 800;">✓</span> {{ claim }}
+          </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p style="color: var(--text-muted); font-size: 0.9rem;">No specific claims matched or compared standalone.</p>
+      {% endif %}
+    </div>
+
+    <!-- Possible Mismatches -->
+    <div class="card" style="border-top: 4px solid var(--accent-rose);">
+      <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--accent-rose); display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+        <svg style="width: 22px; height: 22px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+        Possible Mismatches
+      </h3>
+      {% if analysis_result.possible_mismatches %}
+        <ul style="list-style-type: none; padding: 0;">
+          {% for mismatch in analysis_result.possible_mismatches %}
+          <li style="padding: 0.6rem 0; border-bottom: 1px solid var(--border-color); font-size: 0.92rem; color: #991b1b; display: flex; gap: 0.5rem; align-items: flex-start;">
+            <span style="color: var(--accent-rose); font-weight: 800;">⚠</span> {{ mismatch }}
+          </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p style="color: var(--text-muted); font-size: 0.9rem;">No mismatches detected between code and report claims.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Technical Code Explanation -->
+  <div class="card" style="margin-bottom: 2rem;">
+    <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--primary); margin-bottom: 0.75rem;">Technical Code Overview</h3>
+    <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-main);">{{ analysis_result.code_explanation }}</p>
+  </div>
+
+  <!-- Possible Viva Questions From Code -->
+  <div class="card" style="border-left: 6px solid var(--secondary);">
+    <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--secondary); margin-bottom: 1rem;">Possible Examiner Viva Questions From Code</h3>
+    <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+      {% for q in analysis_result.possible_viva_questions %}
+      <div style="background-color: #f5f3ff; border: 1px solid #ddd6fe; border-radius: var(--radius-md); padding: 1rem 1.25rem; font-weight: 600; font-size: 0.95rem; color: #4c1d95;">
+        <span style="color: var(--secondary); font-weight: 800; margin-right: 0.5rem;">Q:</span> {{ q }}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
